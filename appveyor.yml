@@ -34,12 +34,12 @@ install:
   # upgrade pip to avoid out-of-date warnings
   - "pip install --disable-pip-version-check --user --upgrade pip"
 
-  # install wheel to build compiled packages
-  - "pip install --upgrade wheel"
+  # # install wheel to build compiled packages
+  # - "pip install --upgrade wheel"
 
   # install PyQt5
-  - "(New-Object System.Net.WebClient).DownloadString(\"http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x64.exe\",\"C:\\install-PyQt5.exe\")"
-  - "C:\\install-PyQt5.exe"
+  - ps: (new-object net.webclient).DownloadFile('http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x64.exe', 'install-PyQt5.exe')
+  - "install-PyQt5.exe"
 
   # install
   - "pip"

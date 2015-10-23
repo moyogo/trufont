@@ -42,7 +42,7 @@ install:
   - "install-PyQt5.exe"
 
   # install
-  - "pip"
+  - "python setup.py install"
 
 build: false
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # import sys
-
+import os
 from setuptools import setup
+from distutils.cmd import Command
 
 try:
     import fontTools  # noqa
@@ -13,13 +14,15 @@ except:
 try:
     import robofab  # noqa
 except:
-    print("*** Warning: trufont requires RoboFab (the python3-ufo3 branch), see:")
+    print("*** Warning: trufont requires RoboFab (the python3-ufo3 branch), "
+          "see:")
     print("    https://github.com/trufont/robofab")
 
 try:
-    import defcon # noqa
+    import defcon  # noqa
 except:
-    print("*** Warning: trufont requires defcon (the python3-ufo3 branch), see:")
+    print("*** Warning: trufont requires defcon (the python3-ufo3 branch), "
+          "see:")
     print("    https://github.com/trufont/defcon")
 
 # if "sdist" in sys.argv:
@@ -37,11 +40,42 @@ except:
 #    # remove doctrees
 #    shutil.rmtree(doctrees)
 
+CURR_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
+
+
+class TestCommand(Command):
+    """ Run all *_test.py scripts in 'tests' folder with the same Python
+    interpreter used to run setup.py.
+    """
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import sys
+        import subprocess
+        import glob
+
+        test_dir = os.path.join(CURR_DIR, 'tests')
+        os.chdir(test_dir)
+
+        for test in glob.glob("**/*_test.py"):
+            print(test)
+            try:
+                subprocess.check_call([sys.executable, test])
+            except subprocess.CalledProcessError:
+                raise SystemExit(1)
 
 setup(
     name="defconQt",
     version="0.1.0",
-    description="Trufont, a cross-platform font editor (a set of Qt interface objects for working with font data).",
+    description="Trufont, a cross-platform font editor (a set of Qt interface "
+                "objects for working with font data).",
     author="Adrien Tétar",
     author_email="adri-from-59@hotmail.fr",
     url="http://trufont.github.io",
@@ -54,16 +88,19 @@ setup(
         "defconQt.util",
     ],
     entry_points={
-       'gui_scripts': [
+        "gui_scripts": [
             "trufont =  defconQt.__main__:main"
-            ]
-        },
+        ]
+    },
     package_dir={"": "Lib"},
-    platforms=["Linux","Win32","Mac OS X"],
+    platforms=["Linux", "Win32", "Mac OS X"],
     classifiers=[
-    "Environment :: GUI",
-    "Programming Language :: Python :: 3.4",
-    "Intended Audience :: Developers",
-    "Topic :: Text Processing :: Fonts",
+        "Environment :: GUI",
+        "Programming Language :: Python :: 3.4",
+        "Intended Audience :: Developers",
+        "Topic :: Text Processing :: Fonts",
     ],
+    cmdclass={
+        'test': TestCommand
+    }
 )

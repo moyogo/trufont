@@ -38,6 +38,7 @@ install:
   # - "pip install --upgrade wheel"
 
   # install PyQt5
+  - "python -c 'import PyQt5'"
   - ps: (new-object net.webclient).DownloadFile('http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.5/PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x64.exe', 'install-PyQt5.exe')
   - "install-PyQt5.exe"
 

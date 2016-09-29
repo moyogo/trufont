@@ -37,23 +37,47 @@ class InspectorWindow(QWidget):
             "(|([a-fA-F0-9]{4,6})( ([a-fA-F0-9]{4,6}))*)")
         unicodesValidator = QRegularExpressionValidator(unicodesRegExp, self)
         self.unicodesEdit.setValidator(unicodesValidator)
+
         widthLabel = RLabel(self.tr("Width:"), self)
         self.widthEdit = QLineEdit(self)
         self.widthEdit.editingFinished.connect(self.writeWidth)
         self.widthEdit.setMaximumWidth(columnOneWidth)
         self.widthEdit.setValidator(QIntValidator(self))
+
         leftSideBearingLabel = RLabel(self.tr("Left:"), self)
         self.leftSideBearingEdit = QLineEdit(self)
         self.leftSideBearingEdit.editingFinished.connect(
             self.writeLeftSideBearing)
         self.leftSideBearingEdit.setMaximumWidth(columnOneWidth)
         self.leftSideBearingEdit.setValidator(QIntValidator(self))
+
         rightSideBearingLabel = RLabel(self.tr("Right:"), self)
         self.rightSideBearingEdit = QLineEdit(self)
         self.rightSideBearingEdit.editingFinished.connect(
             self.writeRightSideBearing)
         self.rightSideBearingEdit.setMaximumWidth(columnOneWidth)
         self.rightSideBearingEdit.setValidator(QIntValidator(self))
+
+        heightLabel = RLabel(self.tr("Height:"), self)
+        self.heightEdit = QLineEdit(self)
+        self.heightEdit.editingFinished.connect(self.writeHeight)
+        self.heightEdit.setMaximumWidth(columnOneWidth)
+        self.heightEdit.setValidator(QIntValidator(self))
+
+        topSideBearingLabel = RLabel(self.tr("Top:"), self)
+        self.topSideBearingEdit = QLineEdit(self)
+        self.topSideBearingEdit.editingFinished.connect(
+            self.writeTopSideBearing)
+        self.topSideBearingEdit.setMaximumWidth(columnOneWidth)
+        self.topSideBearingEdit.setValidator(QIntValidator(self))
+
+        bottomSideBearingLabel = RLabel(self.tr("Bottom:"), self)
+        self.bottomSideBearingEdit = QLineEdit(self)
+        self.bottomSideBearingEdit.editingFinished.connect(
+            self.writeBottomSideBearing)
+        self.bottomSideBearingEdit.setMaximumWidth(columnOneWidth)
+        self.bottomSideBearingEdit.setValidator(QIntValidator(self))
+
         markColorLabel = RLabel(self.tr("Flag:"), self)
         self.markColorWidget = ColorVignette(self)
         self.markColorWidget.colorChanged.connect(
@@ -74,6 +98,14 @@ class InspectorWindow(QWidget):
         glyphLayout.addWidget(self.leftSideBearingEdit, l, 1)
         glyphLayout.addWidget(rightSideBearingLabel, l, 2)
         glyphLayout.addWidget(self.rightSideBearingEdit, l, 3)
+        l += 1
+        glyphLayout.addWidget(heightLabel, l, 0)
+        glyphLayout.addWidget(self.heightEdit, l, 1)
+        l += 1
+        glyphLayout.addWidget(topSideBearingLabel, l, 0)
+        glyphLayout.addWidget(self.topSideBearingEdit, l, 1)
+        glyphLayout.addWidget(bottomSideBearingLabel, l, 2)
+        glyphLayout.addWidget(self.bottomSideBearingEdit, l, 3)
         l += 1
         glyphLayout.addWidget(markColorLabel, l, 0)
         glyphLayout.addWidget(self.markColorWidget, l, 1)
@@ -286,18 +318,26 @@ class InspectorWindow(QWidget):
         name = None
         unicodes = None
         width = None
+        height = None
         leftSideBearing = None
         rightSideBearing = None
+        bottomSideBearing = None
+        topSideBearing = None
         markColor = None
         if self._glyph is not None:
             name = self._glyph.name
             unicodes = " ".join("%06X" % u if u > 0xFFFF else "%04X" %
                                 u for u in self._glyph.unicodes)
             width = str(int(self._glyph.width))
+            height = str(int(self._glyph.height))
             if self._glyph.leftMargin is not None:
                 leftSideBearing = str(int(self._glyph.leftMargin))
             if self._glyph.rightMargin is not None:
                 rightSideBearing = str(int(self._glyph.rightMargin))
+            if self._glyph.bottomMargin is not None:
+                bottomSideBearing = str(int(self._glyph.bottomMargin))
+            if self._glyph.topMargin is not None:
+                topSideBearing = str(int(self._glyph.topMargin))
             if self._glyph.markColor is not None:
                 markColor = QColor.fromRgbF(
                     *tuple(self._glyph.markColor))
@@ -305,8 +345,11 @@ class InspectorWindow(QWidget):
         self.nameEdit.setText(name)
         self.unicodesEdit.setText(unicodes)
         self.widthEdit.setText(width)
+        self.heightEdit.setText(height)
         self.leftSideBearingEdit.setText(leftSideBearing)
         self.rightSideBearingEdit.setText(rightSideBearing)
+        self.bottomSideBearingEdit.setText(bottomSideBearing)
+        self.topSideBearingEdit.setText(topSideBearing)
         self.markColorWidget.setColor(markColor)
 
     def _updateLayerAttributes(self, notification=None):
@@ -359,6 +402,11 @@ class InspectorWindow(QWidget):
             return
         self._glyph.width = int(self.widthEdit.text())
 
+    def writeHeight(self):
+        if self._glyph is None:
+            return
+        self._glyph.height = int(self.heightEdit.text())
+
     def writeLeftSideBearing(self):
         if self._glyph is None:
             return
@@ -368,6 +416,16 @@ class InspectorWindow(QWidget):
         if self._glyph is None:
             return
         self._glyph.rightMargin = int(self.rightSideBearingEdit.text())
+
+    def writeBottomSideBearing(self):
+        if self._glyph is None:
+            return
+        self._glyph.bottomMargin = int(self.bottomSideBearingEdit.text())
+
+    def writeTopSideBearing(self):
+        if self._glyph is None:
+            return
+        self._glyph.topMargin = int(self.topSideBearingEdit.text())
 
     def writeMarkColor(self):
         color = self.markColorWidget.color()
